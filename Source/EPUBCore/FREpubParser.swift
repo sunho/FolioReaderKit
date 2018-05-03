@@ -109,7 +109,19 @@ open class FREpubParser: NSObject, SSZipArchiveDelegate {
         // Skip from backup this folder
         try addSkipBackupAttributeToItemAtURL(URL(fileURLWithPath: bookBasePath, isDirectory: true))
 
+        return try self.readEpub(bookBasePath: bookBasePath)
+    }
+    
+    
+    public func readEpub(bookBasePath: String) throws -> FRBook {
+        let fileManager = FileManager.default
+        guard fileManager.fileExists(atPath: bookBasePath) else {
+            throw FolioReaderError.bookNotAvailable
+        }
+        
+        let bookName = bookBasePath.lastPathComponent
         book.name = bookName
+        
         try readContainer(with: bookBasePath)
         try readOpf(with: bookBasePath)
         return self.book

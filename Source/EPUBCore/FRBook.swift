@@ -24,15 +24,15 @@ open class FRBook: NSObject {
     public var tableOfContents: [FRTocReference]!
     public var flatTableOfContents: [FRTocReference]!
 
-    var hasAudio: Bool {
+    public var hasAudio: Bool {
         return smils.smils.count > 0
     }
 
-    var title: String? {
+    public var title: String? {
         return metadata.titles.first
     }
 
-    var authorName: String? {
+    public var authorName: String? {
         return metadata.creators.first?.name
     }
 
