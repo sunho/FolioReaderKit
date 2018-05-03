@@ -4,4 +4,8 @@ github "alexpopov/ZFDragableModalTransition" "merge-carthage-into-zoonooz"
 github "tadija/AEXML" == 4.2.2
 github "ArtSabintsev/FontBlaster" == 4.0.1
 github "jessesquires/JSQWebViewController" == 6.0.0
-github "realm/realm-cocoa" == 3.1.1
+github "realm/realm-cocoa" == 3.4.0
+
+"/private/var/mobile/Containers/Shared/AppGroup/03382864-DC2E-492B-837A-B0D7E830221F/books/Strike the Blood, Vol. 1 The Right Arm of the Saint - Gakuto Mikumo.epub/OEBPS/copyright.xhtml"
+
+file:///private/var/mobile/Containers/Shared/AppGroup/03382864-DC2E-492B-837A-B0D7E830221F/books/Strike%20the%20Blood,%20Vol.%201%20The%20Right%20Arm%20of%20the%20Saint%20-%20Gakuto%20Mikumo.epub/

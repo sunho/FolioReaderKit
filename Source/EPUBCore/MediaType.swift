@@ -39,7 +39,7 @@ public func == (lhs: MediaType, rhs: MediaType) -> Bool {
 /**
  Manages mediatypes that are used by epubs.
  */
-extension MediaType {
+public extension MediaType {
     static let xhtml = MediaType(name: "application/xhtml+xml", defaultExtension: "xhtml", extensions: ["htm", "html", "xhtml", "xml"])
     static let epub = MediaType(name: "application/epub+zip", defaultExtension: "epub")
     static let ncx = MediaType(name: "application/x-dtbncx+xml", defaultExtension: "ncx")

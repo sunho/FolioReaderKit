@@ -10,7 +10,7 @@ import UIKit
 
 open class FRResources: NSObject {
     
-    var resources = [String: FRResource]()
+    public var resources = [String: FRResource]()
 
     /**
      Adds a resource to the resources.
