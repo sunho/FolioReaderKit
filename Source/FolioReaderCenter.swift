@@ -460,10 +460,11 @@ open class FolioReaderCenter: UIViewController, UICollectionViewDelegate, UIColl
         let mediaOverlayStyleColors = "\"\(self.readerConfig.mediaOverlayColor.hexString(false))\", \"\(self.readerConfig.mediaOverlayColor.highlightColor().hexString(false))\""
 
         // Inject CSS
+        let jqFilePath = Bundle.frameworkBundle().path(forResource: "jquery", ofType: "js")
         let jsFilePath = Bundle.frameworkBundle().path(forResource: "Bridge", ofType: "js")
         let cssFilePath = Bundle.frameworkBundle().path(forResource: "Style", ofType: "css")
         let cssTag = "<link rel=\"stylesheet\" type=\"text/css\" href=\"\(cssFilePath!)\">"
-        let jsTag = "<script type=\"text/javascript\" src=\"\(jsFilePath!)\"></script>" +
+        let jsTag = "<script type=\"text/javascript\" src=\"\(jqFilePath!)\"></script><script type=\"text/javascript\" src=\"\(jsFilePath!)\"></script>" +
         "<script type=\"text/javascript\">setMediaOverlayStyleColors(\(mediaOverlayStyleColors))</script>"
 
         let toInject = "\n\(cssTag)\n\(jsTag)\n</head>"
@@ -619,6 +620,7 @@ open class FolioReaderCenter: UIViewController, UICollectionViewDelegate, UIColl
     }
 
     func updateCurrentPage(_ page: FolioReaderPage? = nil, completion: (() -> Void)? = nil) {
+        collectionView.isUserInteractionEnabled = true
         if let page = page {
             currentPage = page
             self.previousPageNumber = page.pageNumber-1
@@ -1207,11 +1209,7 @@ open class FolioReaderCenter: UIViewController, UICollectionViewDelegate, UIColl
                 self.delegate?.pageItemChanged?(webViewPage)
             }
         } else {
-            if !isCollectionScrolling {
-               isCollectionScrolling = true
-            } else {
-                scrollView.isUserInteractionEnabled = false
-            }
+            scrollView.isUserInteractionEnabled = false
         }
 
         self.updatePageScrollDirection(inScrollView: scrollView, forScrollType: scrollType)
@@ -1238,11 +1236,6 @@ open class FolioReaderCenter: UIViewController, UICollectionViewDelegate, UIColl
     open func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
         self.isScrolling = false
 
-        if (scrollView is UICollectionView) {
-            self.isCollectionScrolling = false
-            scrollView.isUserInteractionEnabled = true
-        }
-        
         // Perform the page after a short delay as the collection view hasn't completed it's transition if this method is called (the index paths aren't right during fast scrolls).
         delay(0.2, closure: { [weak self] in
             if (self?.readerConfig.scrollDirection == .horizontalWithVerticalContent),

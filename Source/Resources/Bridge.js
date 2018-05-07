@@ -152,7 +152,8 @@ var getSelectedSentence = function() {
             sentence = "";
         }
     }
-    return sentence;
+    var d = $("p").text();
+    return d;
 }
 
 // Method that gets the Rect of current selected text

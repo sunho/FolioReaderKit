@@ -76,6 +76,7 @@ open class FolioReaderWebView: UIWebView {
             return
         }
         let highlightAndReturn = js("getSelectedSentence()")
+        print(highlightAndReturn)
         self.setMenuVisible(false)
         self.clearTextSelection()
 
