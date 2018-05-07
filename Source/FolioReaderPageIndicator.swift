@@ -10,7 +10,6 @@ import UIKit
 
 class FolioReaderPageIndicator: UIView {
     var pagesLabel: UILabel!
-    var minutesLabel: UILabel!
     var totalMinutes: Int!
     var totalPages: Int!
     var currentPage: Int = 1 {
@@ -40,12 +39,6 @@ class FolioReaderPageIndicator: UIView {
         pagesLabel.font = UIFont(name: "Avenir-Light", size: 10)!
         pagesLabel.textAlignment = NSTextAlignment.right
         addSubview(pagesLabel)
-
-        minutesLabel = UILabel(frame: CGRect.zero)
-        minutesLabel.font = UIFont(name: "Avenir-Light", size: 10)!
-        minutesLabel.textAlignment = NSTextAlignment.right
-        //        minutesLabel.alpha = 0
-        addSubview(minutesLabel)
     }
 
     required init?(coder aDecoder: NSCoder) {
@@ -53,12 +46,9 @@ class FolioReaderPageIndicator: UIView {
     }
 
     func reloadView(updateShadow: Bool) {
-        minutesLabel.sizeToFit()
         pagesLabel.sizeToFit()
 
-        let fullW = pagesLabel.frame.width + minutesLabel.frame.width
-        minutesLabel.frame.origin = CGPoint(x: frame.width/2-fullW/2, y: 2)
-        pagesLabel.frame.origin = CGPoint(x: minutesLabel.frame.origin.x+minutesLabel.frame.width, y: 2)
+        pagesLabel.frame.origin = CGPoint(x: frame.width/2-pagesLabel.frame.width/2, y: 2)
         
         if updateShadow {
             layer.shadowPath = UIBezierPath(rect: bounds).cgPath
@@ -82,7 +72,6 @@ class FolioReaderPageIndicator: UIView {
         animation.timingFunction = CAMediaTimingFunction(name: kCAMediaTimingFunctionEaseInEaseOut)
         layer.add(animation, forKey: "shadowColor")
 
-        minutesLabel.textColor = self.folioReader.isNight(UIColor(white: 1, alpha: 0.3), UIColor(white: 0, alpha: 0.6))
         pagesLabel.textColor = self.folioReader.isNight(UIColor(white: 1, alpha: 0.6), UIColor(white: 0, alpha: 0.9))
     }
 
@@ -93,15 +82,6 @@ class FolioReaderPageIndicator: UIView {
             pagesLabel.text = " " + self.readerConfig.localizedReaderOnePageLeft
         } else {
             pagesLabel.text = " \(pagesRemaining) " + self.readerConfig.localizedReaderManyPagesLeft
-        }
-
-        let minutesRemaining = Int(ceil(CGFloat((pagesRemaining * totalMinutes)/totalPages)))
-        if minutesRemaining > 1 {
-            minutesLabel.text = "\(minutesRemaining) " + self.readerConfig.localizedReaderManyMinutes+" ·"
-        } else if minutesRemaining == 1 {
-            minutesLabel.text = self.readerConfig.localizedReaderOneMinute+" ·"
-        } else {
-            minutesLabel.text = self.readerConfig.localizedReaderLessThanOneMinute+" ·"
         }
 
         reloadView(updateShadow: false)

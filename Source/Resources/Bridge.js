@@ -103,6 +103,7 @@ function highlightString(style) {
     return JSON.stringify(params);
 }
 
+
 // Menu colors
 function setHighlightStyle(style) {
     thisHighlight.className = style;
@@ -131,6 +132,27 @@ function getBodyText() {
 // Method that returns only selected text plain
 var getSelectedText = function() {
     return window.getSelection().toString();
+}
+
+var getSelectedSentence = function() {
+    var range = window.getSelection().getRangeAt(0);
+    var con = range.startContainer.textContent;
+    var sentence = "";
+    var included = false;
+    for(var i=0; i<con.length; i++) {
+        if(i == range.startOffset) {
+            included = true;
+        }
+        sentence += con.charAt(i);
+        
+        if(con.charAt(i) == '.' || con.charAt(i) == '?') {
+            if(included) {
+                return sentence;
+            }
+            sentence = "";
+        }
+    }
+    return sentence;
 }
 
 // Method that gets the Rect of current selected text
@@ -615,3 +637,4 @@ var onClassBasedListenerClick = function(schemeName, attributeContent) {
 	// Set the custom link URL to the event
 	window.location = schemeName + "://" + attributeContent + positionParameterString;
 }
+

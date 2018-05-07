@@ -70,6 +70,7 @@ open class FolioReaderCenter: UIViewController, UICollectionViewDelegate, UIColl
     var currentPageNumber: Int = 0
     var pageWidth: CGFloat = 0.0
     var pageHeight: CGFloat = 0.0
+    var isCollectionScrolling = false
 
     fileprivate var screenBounds: CGRect!
     fileprivate var pointNow = CGPoint.zero
@@ -413,11 +414,6 @@ open class FolioReaderCenter: UIViewController, UICollectionViewDelegate, UIColl
 
         UIView.animate(withDuration: 0.25, animations: {
             readerContainer.setNeedsStatusBarAppearanceUpdate()
-
-            // Show minutes indicator
-            if (shouldShowIndicator == true) {
-                self.pageIndicatorView?.minutesLabel.alpha = shouldHide ? 0 : 1
-            }
         })
         self.navigationController?.setNavigationBarHidden(shouldHide, animated: true)
     }
@@ -630,7 +626,6 @@ open class FolioReaderCenter: UIViewController, UICollectionViewDelegate, UIColl
         } else {
             let currentIndexPath = getCurrentIndexPath()
             currentPage = collectionView.cellForItem(at: currentIndexPath) as? FolioReaderPage
-
             self.previousPageNumber = currentIndexPath.row
             self.currentPageNumber = currentIndexPath.row+1
         }
@@ -683,7 +678,6 @@ open class FolioReaderCenter: UIViewController, UICollectionViewDelegate, UIColl
     func getCurrentIndexPath() -> IndexPath {
         let indexPaths = collectionView.indexPathsForVisibleItems
         var indexPath = IndexPath()
-
         if indexPaths.count > 1 {
             let first = indexPaths.first!
             let last = indexPaths.last!
@@ -705,7 +699,6 @@ open class FolioReaderCenter: UIViewController, UICollectionViewDelegate, UIColl
         } else {
             indexPath = indexPaths.first ?? IndexPath(row: 0, section: 0)
         }
-
         return indexPath
     }
 
@@ -1207,12 +1200,17 @@ open class FolioReaderCenter: UIViewController, UICollectionViewDelegate, UIColl
                         self.currentWebViewScrollPositions[currentIndexPathRow] = scrollView.contentOffset
                     }
                 }
-
                 if (pageIndicatorView?.currentPage != webViewPage) {
                     pageIndicatorView?.currentPage = webViewPage
                 }
                 
                 self.delegate?.pageItemChanged?(webViewPage)
+            }
+        } else {
+            if !isCollectionScrolling {
+               isCollectionScrolling = true
+            } else {
+                scrollView.isUserInteractionEnabled = false
             }
         }
 
@@ -1226,9 +1224,9 @@ open class FolioReaderCenter: UIViewController, UICollectionViewDelegate, UIColl
         // The movement is either positive or negative. This happens if the page change isn't completed. Toggle to the other scroll direction then.
         let isCurrentlyPositive = (self.pageScrollDirection == .left || self.pageScrollDirection == .up)
 
-        if (scrollViewContentOffsetForDirection < pointNowForDirection) {
+        if (scrollViewContentOffsetForDirection <= pointNowForDirection) {
             self.pageScrollDirection = .negative(withConfiguration: self.readerConfig, scrollType: scrollType)
-        } else if (scrollViewContentOffsetForDirection > pointNowForDirection) {
+        } else if (scrollViewContentOffsetForDirection >= pointNowForDirection) {
             self.pageScrollDirection = .positive(withConfiguration: self.readerConfig, scrollType: scrollType)
         } else if (isCurrentlyPositive == true) {
             self.pageScrollDirection = .negative(withConfiguration: self.readerConfig, scrollType: scrollType)
@@ -1240,6 +1238,11 @@ open class FolioReaderCenter: UIViewController, UICollectionViewDelegate, UIColl
     open func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
         self.isScrolling = false
 
+        if (scrollView is UICollectionView) {
+            self.isCollectionScrolling = false
+            scrollView.isUserInteractionEnabled = true
+        }
+        
         // Perform the page after a short delay as the collection view hasn't completed it's transition if this method is called (the index paths aren't right during fast scrolls).
         delay(0.2, closure: { [weak self] in
             if (self?.readerConfig.scrollDirection == .horizontalWithVerticalContent),
@@ -1446,7 +1449,7 @@ extension FolioReaderCenter: FolioReaderChapterListDelegate {
     }
     
     func getScreenBounds() -> CGRect {
-        var bounds = view.frame
+        var bounds = view.bounds
         
         if #available(iOS 11.0, *) {
             bounds.size.height = bounds.size.height - view.safeAreaInsets.bottom

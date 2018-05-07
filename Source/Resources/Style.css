@@ -271,6 +271,11 @@ h6 {
     font-size: 0.67em;
     line-height: 1.2;
 }
+
+img {
+    max-width: 90% !important;
+    max-height: 90% !important;
+}
 body {
     word-break: break-word !important;
     -webkit-hyphens: auto !important;
