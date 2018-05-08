@@ -8,8 +8,6 @@
 
 import UIKit
 
-import RealmSwift
-
 // MARK: - FolioReaderScrollDirection
 
 /// Defines the Reader scrolling direction

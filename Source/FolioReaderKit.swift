@@ -83,6 +83,7 @@ public enum MediaOverlayStyle: Int {
     ///   - book: The Book instance
     @objc optional func folioReader(_ folioReader: FolioReader, didFinishedLoading book: FRBook)
     
+    
     /// Called when reader did closed.
     ///
     /// - Parameter folioReader: The FolioReader instance
@@ -91,6 +92,8 @@ public enum MediaOverlayStyle: Int {
     /// Called when reader did closed.
     @available(*, deprecated, message: "Use 'folioReaderDidClose(_ folioReader: FolioReader)' instead.")
     @objc optional func folioReaderDidClosed()
+    
+    @objc func presentDictView(bookName: String, page: Int, scroll: CGFloat, sentence: String, word: String, index: Int)
 }
 
 /// Main Library class with some useful constants and methods
@@ -107,7 +110,7 @@ open class FolioReader: NSObject {
 
     /// FolioReaderDelegate
     open weak var delegate: FolioReaderDelegate?
-    
+
     open weak var readerContainer: FolioReaderContainer?
     open weak var readerAudioPlayer: FolioReaderAudioPlayer?
     open weak var readerCenter: FolioReaderCenter? {

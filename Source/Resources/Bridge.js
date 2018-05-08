@@ -154,6 +154,7 @@ function getSelectedSentence() {
     
     var middleCon = node.textContent;
     
+    var index = 0;
     for(var i=0; i < middleCon.length; i++) {
         if(i == range.startOffset) {
             included = true;
@@ -161,22 +162,27 @@ function getSelectedSentence() {
         var char = middleCon.charAt(i);
         middle += char;
         
+        if(char == ' ' && !included) {
+            index ++;
+        }
+
         if(char == '.' || char == '?') {
             if(included) {
                 needEnd = false;
                 break;
             }
+            index = 0;
             middle = "";
             needFront = false;
         } 
     }
     
     var front = "";
-    
+
     if (needFront) {
         var iter = node.previousSibling;
         while (iter) {
-            if (iter.nodeType == 3) {
+            if (iter.nodeName != "chunk") {
                 var texts = iter.textContent.split(/[.?]+/);
                 front = texts[texts.length-1] + front;
                 if (texts.length != 1) {
@@ -193,7 +199,7 @@ function getSelectedSentence() {
     if (needEnd) {
         var iter = node.nextSibling;
         while (iter) {
-            if (iter.nodeType == 3) {
+            if (iter.nodeName != "chunk") {
                 var texts = iter.textContent.split(/[.?]+/);
                 end += texts[0];
                 if (texts.length != 1) {
@@ -204,8 +210,9 @@ function getSelectedSentence() {
             iter = iter.nextSibling;
         }
     }
-    
-    return front+middle+end+endChar;
+    index += front.split(" ").length - 1;
+    var resp = {sentence: front+middle+end+endChar, index: index};
+    return JSON.stringify(resp);
 }
 
 // Method that gets the Rect of current selected text

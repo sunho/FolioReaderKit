@@ -8,6 +8,7 @@
 
 import UIKit
 
+
 /// The custom WebView used in each page
 open class FolioReaderWebView: UIWebView {
     var isOneWord = false
@@ -58,17 +59,26 @@ open class FolioReaderWebView: UIWebView {
     // MARK: - UIMenuController - Actions
 
     @objc func define(_ sender: UIMenuController?) {
-        guard let selectedText = js("getSelectedText()") else {
+        guard let word = js("getSelectedText()") else {
             return
         }
-        let highlightAndReturn = js("getSelectedSentence()")
+        var sentence = ""
+        var index = -1
+        if let data = js("getSelectedSentence()")?.data(using: String.Encoding.utf8) {
+            if let json = try? JSONSerialization.jsonObject(with: data, options: []) {
+                if let obj = json as? [String: Any] {
+                    sentence = obj["sentence"] as? String ?? ""
+                    index = obj["index"] as? Int ?? -1
+                }
+            }
+        }
         self.setMenuVisible(false)
         self.clearTextSelection()
 
-        let vc = UIReferenceLibraryViewController(term: selectedText)
-        vc.view.tintColor = self.readerConfig.tintColor
-        guard let readerContainer = readerContainer else { return }
-        readerContainer.show(vc, sender: nil)
+        let bookName = self.folioReader.readerContainer?.book.name ?? ""
+        let page = self.folioReader.readerCenter?.currentPage?.pageNumber ?? -1
+        let scroll = self.scrollView.contentOffset.forDirection(withConfiguration: readerConfig)
+        folioReader.delegate?.presentDictView(bookName: bookName, page: page,scroll: scroll, sentence: sentence, word: word, index: index)
     }
 
     // MARK: - Create and show menu
