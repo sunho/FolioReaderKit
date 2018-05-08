@@ -145,42 +145,8 @@ open class FolioReaderPage: UICollectionViewCell, UIWebViewDelegate, UIGestureRe
         URLCache.shared.removeAllCachedResponses()
         URLCache.shared.diskCapacity = 0
         URLCache.shared.memoryCapacity = 0
-        // Insert the stored highlights to the HTML
-        let tempHtmlContent = htmlContentWithInsertHighlights(htmlContent)
-        // Load the html into the webview
         webView?.alpha = 0
-        webView?.loadHTMLString(tempHtmlContent, baseURL: baseURL)
-    }
-
-    // MARK: - Highlights
-
-    fileprivate func htmlContentWithInsertHighlights(_ htmlContent: String) -> String {
-        var tempHtmlContent = htmlContent as NSString
-        // Restore highlights
-        guard let bookId = (self.book.name as NSString?)?.deletingPathExtension else {
-            return tempHtmlContent as String
-        }
-
-        let highlights = Highlight.allByBookId(withConfiguration: self.readerConfig, bookId: bookId, andPage: pageNumber as NSNumber?)
-
-        if (highlights.count > 0) {
-            for item in highlights {
-                let style = HighlightStyle.classForStyle(item.type)
-                let tag = "<highlight id=\"\(item.highlightId!)\" onclick=\"callHighlightURL(this);\" class=\"\(style)\">\(item.content!)</highlight>"
-                var locator = item.contentPre + item.content
-                locator += item.contentPost
-                locator = Highlight.removeSentenceSpam(locator) /// Fix for Highlights
-                let range: NSRange = tempHtmlContent.range(of: locator, options: .literal)
-
-                if range.location != NSNotFound {
-                    let newRange = NSRange(location: range.location + item.contentPre.count, length: item.content.count)
-                    tempHtmlContent = tempHtmlContent.replacingCharacters(in: newRange, with: tag) as NSString
-                } else {
-                    print("highlight range not found")
-                }
-            }
-        }
-        return tempHtmlContent as String
+        webView?.loadHTMLString(htmlContent, baseURL: baseURL)
     }
 
     // MARK: - UIWebView Delegate
@@ -204,17 +170,19 @@ open class FolioReaderPage: UICollectionViewCell, UIWebViewDelegate, UIGestureRe
                 audioPlayer.readCurrentSentence()
             }
         }
+        
+        let chunk = self.folioReader.chunkMode
+        webView.js("chunkMode(\(chunk))")
 
         let direction: ScrollDirection = self.folioReader.needsRTLChange ? .positive(withConfiguration: self.readerConfig) : .negative(withConfiguration: self.readerConfig)
 
-        if (self.folioReader.readerCenter?.pageScrollDirection == direction &&
+        if (self.folioReader.readerCenter?.pageScrollDirection  == direction &&
             self.folioReader.readerCenter?.isScrolling == true &&
             self.readerConfig.scrollDirection != .horizontalWithVerticalContent) {
             scrollPageToBottom()
         }
 
         UIView.animate(withDuration: 0.2, animations: {webView.alpha = 1}, completion: { finished in
-            webView.isColors = false
             self.webView?.createMenu(options: false)
         })
 
@@ -494,17 +462,14 @@ open class FolioReaderPage: UICollectionViewCell, UIWebViewDelegate, UIGestureRe
         guard let webView = webView else { return false }
 
         if UIMenuController.shared.menuItems?.count == 0 {
-            webView.isColors = false
             webView.createMenu(options: false)
         }
 
-        if !webView.isShare && !webView.isColors {
-            if let result = webView.js("getSelectedText()") , result.components(separatedBy: " ").count == 1 {
-                webView.isOneWord = true
-                webView.createMenu(options: false)
-            } else {
-                webView.isOneWord = false
-            }
+        if let result = webView.js("getSelectedText()") , result.components(separatedBy: " ").count == 1 {
+            webView.isOneWord = true
+            webView.createMenu(options: false)
+        } else {
+            webView.isOneWord = false
         }
 
         return super.canPerformAction(action, withSender: sender)

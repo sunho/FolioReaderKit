@@ -378,11 +378,7 @@ open class FolioReaderAudioPlayer: NSObject {
             return
         }
 
-        guard let href = readerCenter.getCurrentChapter()?.href else {
-            return
-        }
-
-        // TODO QUESTION: The previous code made it possible to call `playText` with the parameter `href` being an empty string. Was that valid? should this logic be kept?
+        let href = readerCenter.getCurrentChapter()?.href ?? ""
         self.playText(href, text: sentence)
     }
 

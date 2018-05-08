@@ -19,6 +19,7 @@ internal let kCurrentHighlightStyle = "com.folioreader.kCurrentHighlightStyle"
 internal let kCurrentMediaOverlayStyle = "com.folioreader.kMediaOverlayStyle"
 internal let kCurrentScrollDirection = "com.folioreader.kCurrentScrollDirection"
 internal let kNightMode = "com.folioreader.kNightMode"
+internal let kChunkMode = "com.folioreader.kChunkMode"
 internal let kCurrentTOCMenu = "com.folioreader.kCurrentTOCMenu"
 internal let kHighlightRange = 30
 internal let kReuseCellIdentifier = "com.folioreader.Cell.ReuseIdentifier"
@@ -193,6 +194,16 @@ extension FolioReader {
                 }, completion: { (finished: Bool) in
                     NotificationCenter.default.post(name: Notification.Name(rawValue: "needRefreshPageMode"), object: nil)
                 })
+            }
+        }
+    }
+    
+    open var chunkMode: Bool {
+        get { return self.defaults.bool(forKey: kChunkMode) }
+        set (value) {
+            self.defaults.set(value, forKey: kChunkMode)
+            if let readerCenter = self.readerCenter {
+                _ = readerCenter.currentPage?.webView?.js("chunkMode(\(value))")
             }
         }
     }

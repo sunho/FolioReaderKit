@@ -135,9 +135,6 @@ open class FolioReaderConfig: NSObject {
     /// Should hide navigation bar on user tap
     open var shouldHideNavigationOnTap = true
 
-    /// Allow sharing option, if `false` will hide all sharing icons and options
-    open var allowSharing = true
-
     /// Enable TTS (Text To Speech)
     open var enableTTS = true
     
@@ -149,22 +146,6 @@ open class FolioReaderConfig: NSObject {
 
     /// Go to saved position when open a book
     open var loadSavedPositionForCurrentBook = true
-    
-    // MARK: Quote image share
-
-    /// Custom Quote logo
-    open var quoteCustomLogoImage       = UIImage(readerImageNamed: "icon-logo")
-
-    /// Add custom backgrounds and font colors to Quote Images
-    open var quoteCustomBackgrounds     = [QuoteImage]()
-
-    /// Enable or disable default Quote Image backgrounds
-    open var quotePreserveDefaultBackgrounds    = true
-
-    // MARK: Realm
-
-    /// Realm configuration for storing highlights
-    open var realmConfiguration         = Realm.Configuration()
 
     // MARK: Localized strings
 

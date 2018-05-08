@@ -134,26 +134,78 @@ var getSelectedText = function() {
     return window.getSelection().toString();
 }
 
-var getSelectedSentence = function() {
+function chunkMode(enable) {
+    if (enable) {
+        $("chunk").text(" / ");
+    } else {
+        $("chunk").text("");
+    }
+}
+
+function getSelectedSentence() {
     var range = window.getSelection().getRangeAt(0);
-    var con = range.startContainer.textContent;
-    var sentence = "";
+    var node = range.startContainer;
+    
+    var middle = "";
     var included = false;
-    for(var i=0; i<con.length; i++) {
+    
+    var needFront = true;
+    var needEnd = true;
+    
+    var middleCon = node.textContent;
+    
+    for(var i=0; i < middleCon.length; i++) {
         if(i == range.startOffset) {
             included = true;
         }
-        sentence += con.charAt(i);
+        var char = middleCon.charAt(i);
+        middle += char;
         
-        if(con.charAt(i) == '.' || con.charAt(i) == '?') {
+        if(char == '.' || char == '?') {
             if(included) {
-                return sentence;
+                needEnd = false;
+                break;
             }
-            sentence = "";
+            middle = "";
+            needFront = false;
+        } 
+    }
+    
+    var front = "";
+    
+    if (needFront) {
+        var iter = node.previousSibling;
+        while (iter) {
+            if (iter.nodeType == 3) {
+                var texts = iter.textContent.split(/[.?]+/);
+                front = texts[texts.length-1] + front;
+                if (texts.length != 1) {
+                    break;
+                }
+            }
+            iter = iter.previousSibling;
         }
     }
-    var d = $("p").text();
-    return d;
+    
+    var end = "";
+    var endChar = "";
+    
+    if (needEnd) {
+        var iter = node.nextSibling;
+        while (iter) {
+            if (iter.nodeType == 3) {
+                var texts = iter.textContent.split(/[.?]+/);
+                end += texts[0];
+                if (texts.length != 1) {
+                    endChar = iter.textContent.charAt(texts[0].length);
+                    break;
+                }
+            }
+            iter = iter.nextSibling;
+        }
+    }
+    
+    return front+middle+end+endChar;
 }
 
 // Method that gets the Rect of current selected text
@@ -412,7 +464,7 @@ function getSentenceWithIndex(className) {
         sentence = findNextSentenceInArray(elements);
     }
 
-    var text = sentence.innerText || sentence.textContent;
+    var text = $(sentence).clone().find("chunk").remove().end().text();
     
     goToEl(sentence);
     
