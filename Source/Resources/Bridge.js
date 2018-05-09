@@ -166,7 +166,7 @@ function getSelectedSentence() {
             index ++;
         }
 
-        if(char == '.' || char == '?') {
+        if(char.match(/[.?'"()]/)) {
             if(included) {
                 needEnd = false;
                 break;
@@ -183,7 +183,7 @@ function getSelectedSentence() {
         var iter = node.previousSibling;
         while (iter) {
             if (iter.nodeName != "chunk") {
-                var texts = iter.textContent.split(/[.?]+/);
+                var texts = iter.textContent.split(/[.?'"(]/);
                 front = texts[texts.length-1] + front;
                 if (texts.length != 1) {
                     break;
@@ -200,7 +200,7 @@ function getSelectedSentence() {
         var iter = node.nextSibling;
         while (iter) {
             if (iter.nodeName != "chunk") {
-                var texts = iter.textContent.split(/[.?]+/);
+                var texts = iter.textContent.split(/[.?!'")]/);
                 end += texts[0];
                 if (texts.length != 1) {
                     endChar = iter.textContent.charAt(texts[0].length);
@@ -210,6 +210,7 @@ function getSelectedSentence() {
             iter = iter.nextSibling;
         }
     }
+                                                     
     index += front.split(" ").length - 1;
     var resp = {sentence: front+middle+end+endChar, index: index};
     return JSON.stringify(resp);

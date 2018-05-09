@@ -75,7 +75,7 @@ open class FolioReaderWebView: UIWebView {
         self.setMenuVisible(false)
         self.clearTextSelection()
 
-        let bookName = self.folioReader.readerContainer?.book.name ?? ""
+        let bookName = self.book.name ?? ""
         let page = self.folioReader.readerCenter?.currentPage?.pageNumber ?? -1
         let scroll = self.scrollView.contentOffset.forDirection(withConfiguration: readerConfig)
         folioReader.delegate?.presentDictView(bookName: bookName, page: page,scroll: scroll, sentence: sentence, word: word, index: index)
@@ -88,6 +88,7 @@ open class FolioReaderWebView: UIWebView {
             return
         }
 
+        self.folioReader.readerAudioPlayer?.stop(immediate: true)
         let menuController = UIMenuController.shared
 
         let defineItem = UIMenuItem(title: self.readerConfig.localizedDefineMenu, action: #selector(define(_:)))

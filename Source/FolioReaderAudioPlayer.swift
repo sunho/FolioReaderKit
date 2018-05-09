@@ -378,6 +378,10 @@ open class FolioReaderAudioPlayer: NSObject {
             return
         }
 
+        if player?.isPlaying == true {
+            stop(immediate: true)
+        }
+        
         let href = readerCenter.getCurrentChapter()?.href ?? ""
         self.playText(href, text: sentence)
     }

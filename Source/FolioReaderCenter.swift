@@ -250,7 +250,7 @@ open class FolioReaderCenter: UIViewController, UICollectionViewDelegate, UIColl
         let tintColor = readerConfig.tintColor
         let navText = folioReader.isNight(UIColor.white, UIColor.black)
         let font = UIFont(name: "Avenir-Light", size: 17)!
-        setTranslucentNavigation(color: navBackground, tintColor: tintColor, titleColor: navText, andFont: font)
+        setTranslucentNavigation(false, color: navBackground, tintColor: tintColor, titleColor: navText, andFont: font)
     }
 
     func configureNavBarButtons() {
@@ -1113,7 +1113,7 @@ open class FolioReaderCenter: UIViewController, UICollectionViewDelegate, UIColl
             self.isScrolling = false
         }
         // Perform the page after a short delay as the collection view hasn't completed it's transition if this method is called (the index paths aren't right during fast scrolls).
-        delay(0.2, closure: { [weak self] in
+        delay(0.3, closure: { [weak self] in
             if (self?.readerConfig.scrollDirection == .horizontalWithVerticalContent),
                 let cell = ((scrollView.superview as? UIWebView)?.delegate as? FolioReaderPage) {
                 let currentIndexPathRow = cell.pageNumber - 1
