@@ -97,8 +97,8 @@ class FolioReaderFontsMenu: UIViewController, SMSegmentViewDelegate, UIGestureRe
         view.addGestureRecognizer(tapGesture)
 
         // Menu view
-        let visibleHeight: CGFloat = self.readerConfig.canChangeScrollDirection ? 272 : 226
-        menuView = UIView(frame: CGRect(x: 0, y: view.frame.height-visibleHeight, width: view.frame.width, height: view.frame.height))
+        let visibleHeight: CGFloat = self.readerConfig.canChangeScrollDirection ? 217: 171
+        menuView = UIView(frame: CGRect(x: 14, y: view.frame.height-visibleHeight - 14, width: view.frame.width - 28, height: visibleHeight))
         menuView.backgroundColor = self.folioReader.isNight(self.readerConfig.nightModeMenuBackground, UIColor.white)
         menuView.autoresizingMask = .flexibleWidth
         menuView.layer.shadowColor = UIColor.black.cgColor
@@ -108,6 +108,8 @@ class FolioReaderFontsMenu: UIViewController, SMSegmentViewDelegate, UIGestureRe
         menuView.layer.shadowPath = UIBezierPath(rect: menuView.bounds).cgPath
         menuView.layer.rasterizationScale = UIScreen.main.scale
         menuView.layer.shouldRasterize = true
+        menuView.layer.cornerRadius = 10
+        menuView.clipsToBounds = true
         view.addSubview(menuView)
 
         let normalColor = UIColor(white: 0.5, alpha: 0.7)
@@ -126,11 +128,10 @@ class FolioReaderFontsMenu: UIViewController, SMSegmentViewDelegate, UIGestureRe
         let moonSelected = moon?.imageTintColor(selectedColor)?.withRenderingMode(.alwaysOriginal)
         
         // Chunking mode
-        let chunk = SMSegmentView(frame: CGRect(x: 0, y: 0, width: view.frame.width, height: 55),
+        let chunk = SMSegmentView(frame: CGRect(x: 0, y: 0, width: menuView.frame.width, height: 55),
                                      separatorColour: self.readerConfig.nightModeSeparatorColor,
                                      separatorWidth: 0,
                                      segmentProperties:  [
-                                        keySegmentTitleFont: UIFont(name: "Avenir-Light", size: 17)!,
                                         keySegmentOnSelectionColour: UIColor.clear,
                                         keySegmentOffSelectionColour: UIColor.clear,
                                         keySegmentOnSelectionTextColour: selectedColor,
@@ -144,28 +145,28 @@ class FolioReaderFontsMenu: UIViewController, SMSegmentViewDelegate, UIGestureRe
         chunk.selectSegmentAtIndex(self.folioReader.chunkMode.hashValue)
         menuView.addSubview(chunk)
 
-        // Day night mode
-        let dayNight = SMSegmentView(frame: CGRect(x: 0, y: chunk.frame.height+chunk.frame.origin.y, width: view.frame.width, height: 55),
-                                     separatorColour: self.readerConfig.nightModeSeparatorColor,
-                                     separatorWidth: 0,
-                                     segmentProperties:  [
-                                        keySegmentTitleFont: UIFont(name: "Avenir-Light", size: 17)!,
-                                        keySegmentOnSelectionColour: UIColor.clear,
-                                        keySegmentOffSelectionColour: UIColor.clear,
-                                        keySegmentOnSelectionTextColour: selectedColor,
-                                        keySegmentOffSelectionTextColour: normalColor,
-                                        keyContentVerticalMargin: 17 as AnyObject
-            ])
-        dayNight.delegate = self
-        dayNight.tag = 2
-        dayNight.addSegmentWithTitle(self.readerConfig.localizedFontMenuDay, onSelectionImage: sunSelected, offSelectionImage: sunNormal)
-        dayNight.addSegmentWithTitle(self.readerConfig.localizedFontMenuNight, onSelectionImage: moonSelected, offSelectionImage: moonNormal)
-        dayNight.selectSegmentAtIndex(self.folioReader.nightMode.hashValue)
-        menuView.addSubview(dayNight)
+//        // Day night mode
+//        let dayNight = SMSegmentView(frame: CGRect(x: 0, y: chunk.frame.height+chunk.frame.origin.y, width: view.frame.width, height: 55),
+//                                     separatorColour: self.readerConfig.nightModeSeparatorColor,
+//                                     separatorWidth: 0,
+//                                     segmentProperties:  [
+//                                        keySegmentTitleFont: UIFont(name: "Avenir-Light", size: 17)!,
+//                                        keySegmentOnSelectionColour: UIColor.clear,
+//                                        keySegmentOffSelectionColour: UIColor.clear,
+//                                        keySegmentOnSelectionTextColour: selectedColor,
+//                                        keySegmentOffSelectionTextColour: normalColor,
+//                                        keyContentVerticalMargin: 17 as AnyObject
+//            ])
+//        dayNight.delegate = self
+//        dayNight.tag = 2
+//        dayNight.addSegmentWithTitle(self.readerConfig.localizedFontMenuDay, onSelectionImage: sunSelected, offSelectionImage: sunNormal)
+//        dayNight.addSegmentWithTitle(self.readerConfig.localizedFontMenuNight, onSelectionImage: moonSelected, offSelectionImage: moonNormal)
+//        dayNight.selectSegmentAtIndex(self.folioReader.nightMode.hashValue)
+//        menuView.addSubview(dayNight)
 
 
         // Fonts adjust
-        let fontName = SMSegmentView(frame: CGRect(x: 15, y: dayNight.frame.height+dayNight.frame.origin.y, width: view.frame.width-30, height: 55),
+        let fontName = SMSegmentView(frame: CGRect(x: 15, y: chunk.frame.height+chunk.frame.origin.y, width: menuView.frame.width-30, height: 55),
                                      separatorColour: UIColor.clear,
                                      separatorWidth: 0,
                                      segmentProperties:  [
@@ -192,7 +193,7 @@ class FolioReaderFontsMenu: UIViewController, SMSegmentViewDelegate, UIGestureRe
         menuView.addSubview(fontName)
 
         // Font slider size
-        let slider = HADiscreteSlider(frame: CGRect(x: 60, y: fontName.frame.height + fontName.frame.origin.y+2, width: view.frame.width-120, height: 55))
+        let slider = HADiscreteSlider(frame: CGRect(x: 60, y: fontName.frame.height + fontName.frame.origin.y+2, width: menuView.frame.width-120, height: 55))
         slider.tickStyle = ComponentStyle.rounded
         slider.tickCount = 5
         slider.tickSize = CGSize(width: 8, height: 8)
@@ -222,7 +223,7 @@ class FolioReaderFontsMenu: UIViewController, SMSegmentViewDelegate, UIGestureRe
         fontSmallView.contentMode = UIViewContentMode.center
         menuView.addSubview(fontSmallView)
 
-        let fontBigView = UIImageView(frame: CGRect(x: view.frame.width-50, y: fontName.frame.height + fontName.frame.origin.y+14, width: 30, height: 30))
+        let fontBigView = UIImageView(frame: CGRect(x: menuView.frame.width-50, y: fontName.frame.height + fontName.frame.origin.y+14, width: 30, height: 30))
         fontBigView.image = fontBigNormal
         fontBigView.contentMode = UIViewContentMode.center
         menuView.addSubview(fontBigView)
@@ -249,7 +250,6 @@ class FolioReaderFontsMenu: UIViewController, SMSegmentViewDelegate, UIGestureRe
                                             separatorColour: self.readerConfig.nightModeSeparatorColor,
                                             separatorWidth: 1,
                                             segmentProperties:  [
-                                                keySegmentTitleFont: UIFont(name: "Avenir-Light", size: 17)!,
                                                 keySegmentOnSelectionColour: UIColor.clear,
                                                 keySegmentOffSelectionColour: UIColor.clear,
                                                 keySegmentOnSelectionTextColour: selectedColor,
@@ -281,7 +281,6 @@ class FolioReaderFontsMenu: UIViewController, SMSegmentViewDelegate, UIGestureRe
     func segmentView(_ segmentView: SMSegmentView, didSelectSegmentAtIndex index: Int) {
         guard (self.folioReader.readerCenter?.currentPage) != nil else { return }
         if segmentView.tag == 1 {
-            print("asd")
             self.folioReader.chunkMode = Bool(index == 1)
         } else if segmentView.tag == 2 {
 

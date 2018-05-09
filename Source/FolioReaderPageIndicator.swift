@@ -36,7 +36,7 @@ class FolioReaderPageIndicator: UIView {
         layer.shouldRasterize = true
 
         pagesLabel = UILabel(frame: CGRect.zero)
-        pagesLabel.font = UIFont(name: "Avenir-Light", size: 10)!
+        pagesLabel.font = UIFont.systemFont(ofSize: 10)
         pagesLabel.textAlignment = NSTextAlignment.right
         addSubview(pagesLabel)
     }
