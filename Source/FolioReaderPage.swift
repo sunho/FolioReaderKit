@@ -465,11 +465,14 @@ open class FolioReaderPage: UICollectionViewCell, UIWebViewDelegate, UIGestureRe
             webView.createMenu(options: false)
         }
 
-        if let result = webView.js("getSelectedText()") , result.components(separatedBy: " ").count == 1 {
-            webView.isOneWord = true
-            webView.createMenu(options: false)
-        } else {
-            webView.isOneWord = false
+        if let result = webView.js("getSelectedText()") {
+            let arr = result.components(separatedBy: " ")
+            if arr.count == 1 || arr.count == 2 && arr[1] == "" {
+                webView.isOneWord = true
+                webView.createMenu(options: false)
+            } else {
+                webView.isOneWord = false
+            }
         }
 
         return super.canPerformAction(action, withSender: sender)

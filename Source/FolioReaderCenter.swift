@@ -50,10 +50,16 @@ open class FolioReaderCenter: UIViewController, UICollectionViewDelegate, UIColl
     /// The collection view with pages
     open var collectionView: UICollectionView!
     
+    open var actualReadRate: Double {
+        return Double(currentReadPages.count) / Double(currentTotalPages)
+    }
+    
     let collectionViewLayout = UICollectionViewFlowLayout()
     var loadingView: UIActivityIndicatorView!
     var pages: [String]!
     var totalPages: Int = 0
+    var currentTotalPages: Int = 0
+    var currentReadPages: Set<Int> = []
     var tempFragment: String?
     var animator: ZFModalTransitionAnimator!
     var pageIndicatorView: FolioReaderPageIndicator?
@@ -293,12 +299,16 @@ open class FolioReaderCenter: UIViewController, UICollectionViewDelegate, UIColl
         self.setCollectionViewProgressiveDirection()
 
         if self.readerConfig.loadSavedPositionForCurrentBook {
-            guard let position = folioReader.savedPositionForCurrentBook, let pageNumber = position["pageNumber"] as? Int, pageNumber > 0 else {
+            guard let position = folioReader.savedPositionForCurrentBook, let pageNumber = position["pageNumber"] as? Int, pageNumber > 0, let raw = position["readPages"] as? [Int]  else {
                 self.currentPageNumber = 1
                 return
             }
-
-            self.changePageWith(page: pageNumber)
+           let readPages = Set<Int>(raw)
+            self.changePageWith(page: pageNumber, animated: false, completion: { [weak self] in
+                if let instance = self {
+                    instance.currentReadPages = readPages
+                }
+            })
             self.currentPageNumber = pageNumber
         }
     }
@@ -626,7 +636,6 @@ open class FolioReaderCenter: UIViewController, UICollectionViewDelegate, UIColl
         }
 
         self.nextPageNumber = (((self.currentPageNumber + 1) <= totalPages) ? (self.currentPageNumber + 1) : self.currentPageNumber)
-        
         self.collectionView.isUserInteractionEnabled = true
 
         // Set pages
@@ -642,6 +651,7 @@ open class FolioReaderCenter: UIViewController, UICollectionViewDelegate, UIColl
         } else {
             pageIndicatorView?.totalMinutes = 0
         }
+        self.currentReadPages = []
         pagesForCurrentPage(currentPage)
 
         delegate?.pageDidAppear?(currentPage)
@@ -655,11 +665,12 @@ open class FolioReaderCenter: UIViewController, UICollectionViewDelegate, UIColl
 
         let pageSize = self.readerConfig.isDirection(pageHeight, self.pageWidth, pageHeight)
         let contentSize = page.webView?.scrollView.contentSize.forDirection(withConfiguration: self.readerConfig) ?? 0
-        self.pageIndicatorView?.totalPages = ((pageSize != 0) ? Int(ceil(contentSize / pageSize)) : 0)
+        self.currentTotalPages = ((pageSize != 0) ? Int(ceil(contentSize / pageSize)) : 0)
+        self.pageIndicatorView?.totalPages = self.currentTotalPages
 
         let pageOffSet = self.readerConfig.isDirection(webView.scrollView.contentOffset.x, webView.scrollView.contentOffset.x, webView.scrollView.contentOffset.y)
         let webViewPage = pageForOffset(pageOffSet, pageHeight: pageSize)
-
+        self.currentReadPages.insert(webViewPage)
         self.pageIndicatorView?.currentPage = webViewPage
     }
 
@@ -1079,9 +1090,10 @@ open class FolioReaderCenter: UIViewController, UICollectionViewDelegate, UIColl
                     }
                 }
                 if (pageIndicatorView?.currentPage != webViewPage) {
+                    self.currentReadPages.insert(webViewPage)
                     pageIndicatorView?.currentPage = webViewPage
                 }
-                
+
                 self.delegate?.pageItemChanged?(webViewPage)
             }
         } else {
@@ -1233,6 +1245,7 @@ extension FolioReaderCenter: FolioReaderPageDelegate {
 
             if isFirstLoad {
                 updateCurrentPage(page)
+                currentReadPages = Set<Int>((position["readPages"] as? [Int] ?? []))
                 isFirstLoad = false
 
                 if (self.currentPageNumber == pageNumber && pageOffset > 0) {

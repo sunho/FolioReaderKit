@@ -42,6 +42,12 @@ open class FolioReaderWebView: UIWebView {
     required public init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
+    
+    open override func point(inside point: CGPoint, with event: UIEvent?) -> Bool {
+        let rect = self.scrollView.frame
+        let newRect = CGRect(x: rect.origin.x + 8, y: rect.origin.y, width: rect.width - 16, height: rect.height)
+        return newRect.contains(point)
+    }
 
     // MARK: - UIMenuController
 
