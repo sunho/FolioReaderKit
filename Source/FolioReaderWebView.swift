@@ -45,7 +45,7 @@ open class FolioReaderWebView: UIWebView {
     
     open override func point(inside point: CGPoint, with event: UIEvent?) -> Bool {
         let rect = self.scrollView.frame
-        let newRect = CGRect(x: rect.origin.x + 8, y: rect.origin.y, width: rect.width - 16, height: rect.height)
+        let newRect = CGRect(x: rect.origin.x + 10, y: rect.origin.y, width: rect.width - 20, height: rect.height)
         return newRect.contains(point)
     }
 
