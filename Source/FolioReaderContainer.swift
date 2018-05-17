@@ -101,6 +101,16 @@ open class FolioReaderContainer: UIViewController {
             self.addChildViewController(_centerNavigationController)
         }
         self.centerNavigationController?.didMove(toParentViewController: self)
+        self.centerNavigationController?.navigationBar.setBackgroundImage(UIImage.imageWithColor(color: .white), for: .default)
+        self.centerNavigationController?.navigationBar.shadowImage = UIImage.imageWithColor(color: .white)
+        if let bar = self.centerNavigationController?.navigationBar {
+            bar.layer.borderColor = UIColor.clear.cgColor
+            bar.layer.masksToBounds = false
+            bar.layer.shadowColor = UIColor.black.cgColor
+            bar.layer.shadowOpacity = 0.15
+            bar.layer.shadowOffset = CGSize(width: 0, height: 4)
+            bar.layer.shadowRadius = 4
+        }
 
         if (self.readerConfig.hideBars == true) {
             self.readerConfig.shouldHideNavigationOnTap = false

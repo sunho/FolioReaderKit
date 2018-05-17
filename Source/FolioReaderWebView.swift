@@ -98,7 +98,7 @@ open class FolioReaderWebView: UIWebView {
         let menuController = UIMenuController.shared
 
         let defineItem = UIMenuItem(title: self.readerConfig.localizedDefineMenu, action: #selector(define(_:)))
-        var menuItems = [defineItem]
+        let menuItems = [defineItem]
         
         menuController.menuItems = menuItems
     }
